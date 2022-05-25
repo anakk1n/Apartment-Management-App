@@ -7,8 +7,6 @@
 #include "Observer.h"
 #include <string>
 #include <map>
-
-//#include "vectorDinamicTemplate.h"
 #include <functional>
 #include <vector>
 using std::string;
