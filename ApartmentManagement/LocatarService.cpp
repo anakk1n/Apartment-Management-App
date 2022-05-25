@@ -142,3 +142,126 @@ vector<Locatar> LocatarService::sortareNume()
 * date de intrare:-
 * date de iesire:-rez-referinta la VectorDinamic
 */
+vector<Locatar> LocatarService::sortareSuprafata()
+{
+	vector<Locatar> rez{ repo.getAll() };
+	std::sort(rez.begin(), rez.end(), [](const Locatar& loc1, const Locatar& loc2) {return loc1.getSuprafata() <= loc2.getSuprafata(); });
+	return rez;
+}
+
+/*sortare dupa tipul apartamentului si suprafata
+* date de intrare:-
+* date de iesire:-rez-referinta la VectorDinamic
+*/
+vector<Locatar> LocatarService::sortareApartamentSuprafata()
+{
+	vector<Locatar> rez{ repo.getAll() };
+	std::sort(rez.begin(), rez.end(), [](const Locatar& loc1, const Locatar& loc2) {
+		if (loc1.getTipApartament() < loc2.getTipApartament())
+			return true;
+		if (loc1.getTipApartament() == loc2.getTipApartament() && loc1.getSuprafata() <= loc2.getSuprafata())
+			return true;
+		else
+			return false;	});
+	return rez;
+}
+
+/*adauga apartament in lista
+* date de intrare:-nr-referinta la int
+* date de iesire:-
+* */
+void LocatarService::adaugaLista(const int& nr)
+{
+	const Locatar& loc = repo.cautareApartament(nr);
+	lista.adaugaApartament(loc);
+	notify();
+}
+
+/*goleste lista de notificari
+* date de intrare:-
+* date de iesire:-
+*/
+const void LocatarService::golesteLista()
+{
+	lista.golesteLista();
+	notify();
+}
+
+/*returneaza numarul de apartamente din lista
+* date de intrare:-
+* date de iesire:-numarul de apartamente:-int
+*/
+const int LocatarService::nrApartamenteLista()
+{
+	return lista.nrApartamente();
+}
+
+/*genereaza aleatoriu lista
+* date de intrare:-nr-referinta la intreg
+* date de iesire:-
+* programul arunca eroare daca nr<1 sayu daca nr>nr de apartamente din repo
+*/
+void LocatarService::genereazaLista(const int& nr)
+{
+	if (nr > repo.getSize() || nr < 1)
+		throw listaException("numar de apartamente invalid!\n");
+	lista.golesteLista();
+	vector<Locatar> rez = repo.getAll();
+	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::shuffle(rez.begin(), rez.end(), std::default_random_engine(seed));
+	int i = 0;
+	for (const auto& l : rez)
+	{
+		if (i == nr)
+			break;
+		lista.adaugaApartament(l);
+		i++;
+	}
+	notify();
+
+}
+
+/*returneaza toate apartamentele din lista
+	* date de intrare:-
+	* date de iesire:-referinta la vectorul de apartamente
+	*/
+const vector<Locatar>& LocatarService::getAllLista()
+{
+	return lista.getAll();
+}
+
+/*transcrie lista de apartamente in fisier
+* date de intrare::-filename-referinta la string
+* date de iesire:-
+*/
+void LocatarService::writeToFile(const string& fileName)
+{
+	lista.writeToFile(fileName);
+}
+
+map<string, std::pair<string, int>> LocatarService::getMap()
+{
+	map<string, std::pair<string, int>> rez;
+	const auto& locatari{ repo.getAll() };
+	for (const auto& l : locatari)
+		if (rez.find(l.getTipApartament()) == rez.end())
+		{
+			rez[l.getTipApartament()] = std::make_pair(l.getTipApartament(), 1);
+		}
+		else
+			rez[l.getTipApartament()].second++;
+	return rez;
+}
+
+/*undo
+* date de intrare:-
+* date de iesire:-
+*/
+void LocatarService::undo()
+{
+	if (undoActions.size() == 0)
+		throw RepoException("nu se mai poate face undo!\n");
+	undoActions.back()->doUndo();
+	notify();
+	undoActions.pop_back();
+}
