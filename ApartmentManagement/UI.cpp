@@ -302,3 +302,175 @@ void UI::UIgenereazaLista()
 	cout << "nr aparteamente din lista de notificari:" << total;
 }
 
+void UI::UIafisareLista()
+{
+	const vector < Locatar >& locatari = srv.getAllLista();
+	if (locatari.size() == 0)
+	{
+		cout << "lista vida";
+		return;
+	}
+	for (const auto& l : locatari)
+		cout << " Apartament:" << l.getApartament() << " Nume:" << l.getNume() << " Suprafata:" << l.getSuprafata() << " mp Tip Apartament:" << l.getTipApartament() << "\n";
+
+}
+
+void UI::UIexport()
+{
+	string fileName;
+	cout << "numele fisierului=";
+	getline(cin, fileName, '\n');
+	if (fileName == "")
+	{
+		cout << "nume fisier invalid";
+		return;
+	}
+	srv.writeToFile(fileName);
+}
+
+void UI::UIundo()
+{
+	try {
+		srv.undo();
+	}
+	catch (const RepoException& msg)
+	{
+		cout << msg.getMesaj();
+	}
+}
+
+void UI::UIgetMap()
+{
+	map<string, std::pair<string, int>>locatari = srv.getMap();
+	if (locatari.size() == 0)
+	{
+		cout << "nu exista locatari in map";
+		return;
+	}
+	for (const auto& l : locatari)
+		cout << l.first << "->" << l.second.second << "\n";
+}
+
+void UI::UIadauga()
+{
+	srv.adaugaLocatarService(1, "Andrei", 123, "decomandat");
+	srv.adaugaLocatarService(2, "Ana", 1234, "decomandat");
+	srv.adaugaLocatarService(3, "Maria", 985, "comandat");
+	srv.adaugaLocatarService(4, "Radu", 234, "comandat");
+	srv.adaugaLocatarService(5, "Sorin", 324, "comandat");
+	srv.adaugaLocatarService(6, "Diana", 1000, "simplu");
+	srv.adaugaLocatarService(7, "Dana", 678, "simplu");
+	srv.adaugaLocatarService(8, "Cristi", 317, "simplu");
+	srv.adaugaLocatarService(9, "Marius", 751, "complex");
+	srv.adaugaLocatarService(10, "Alex", 978, "complex");
+}
+
+//meniu
+void UI::meniu()
+{
+	cout << "\n1-Adauga locatar\n2-Afisare\n3-Stergere locatar\n4-Modifica locatar\n5-Cauta apartament\n6-Filtrare dupa tipul apartamentului\n7-Filtrare dupa suprafata\n";
+	cout << "8-Sortarea apartamentelor dupa numele locatarilor\n9-Sortarea apartamentelor dupa suprafata\n10-Sortarea apartamentelor dupa tip si suprafata\n";
+	cout << "11-Adauga apartament in lista de notificari\n12-Goleste lista de notificari\n13-Genereaza lista\n14-Afisare lista notificari\n15-Export\n";
+	cout << "16-Adauga\n17-Get Map\n18-Undo\n0-Exit\n";
+}
+//run
+void UI::run()
+{
+	while (true)
+	{
+		string cmd1;
+		int cmd = -1;
+		meniu();
+		cout << ">>>";
+		getline(cin, cmd1, '\n');
+		try {
+			cmd = stoi(cmd1);
+		}
+		catch (const std::invalid_argument) {
+		}
+		switch (cmd)
+		{
+		case(1): {
+			UIadaugaLocatar();
+			break;
+		}
+		case(2): {
+			UIafisareLocatar();
+			break;
+		}
+		case(3): {
+			UIstergereLocatar();
+			break;
+		}
+		case(4): {
+			UImodificaLocatar();
+			break;
+		}
+		case(5): {
+			UIcautaApartament();
+			break;
+		}
+		case(6): {
+			UIfiltrareTipApartament();
+			break;
+		}
+		case(7): {
+			UIfiltrareSuprafata();
+			break;
+		}
+		case(8): {
+			UIsortareNume();
+			break;
+		}
+		case(9): {
+			UIsortareSuprafata();
+			break;
+		}
+		case(10): {
+			UIsortareTipSuprafata();
+			break;
+		}
+		case(11): {
+			UIadaugaListaNotificari();
+			break;
+		}
+		case(12): {
+			UIgolesteLista();
+			break;
+		}
+		case(13): {
+			UIgenereazaLista();
+			break;
+		}
+		case(14): {
+			UIafisareLista();
+			break;
+		}
+		case(15): {
+			UIexport();
+			break;
+		}
+		case(16): {
+			UIadauga();
+			break;
+		}
+		case(17): {
+			UIgetMap();
+			break;
+		}
+		case(18): {
+			UIundo();
+			break;
+		}
+		case(0): {
+			cout << "bye";
+			return;
+		}
+		default: {
+			cout << "comanda invalida!\n";
+			break;
+		}
+		}
+
+	}
+}
