@@ -4,7 +4,6 @@
 #include <vector>
 #include "AbstractRepo.h"
 using std::vector;
-//#include "vectorDinamicTemplate.h"
 class AbstractRepo;
 
 //clasa LocatarRepository
