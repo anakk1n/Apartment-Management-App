@@ -511,3 +511,272 @@ void tabel::init()
 	box->addWidget(table);
 	setLayout(box);
 }
+
+
+//afiseaza lista de locatari din lista de notificari
+//date de intrare:-locatari:-vector
+//                -numar:-int
+//date de iesire:-
+void listNotificariGUI::loadList(vector<Locatar>, int numar)
+{
+	list->clear();
+	for (const auto& l : srv.getAllLista())
+		list->addItem(QString::fromStdString(l.getNume()));
+	list->addItem(QString::fromStdString("numar apartamente: " + std::to_string(numar)));
+}
+
+
+/*initilizare
+date de intrare:-
+date de iesire:-
+*/
+void listNotificariGUI::init()
+{
+	this->setWindowTitle("Lista Notificari");
+	principalBox = new QHBoxLayout;
+	box = new QVBoxLayout;
+	box1 = new QHBoxLayout;
+	box2 = new QHBoxLayout;
+	box3 = new QHBoxLayout;
+	list = new QListWidget;
+
+	//butoane
+	adauga = new QPushButton("&adauga");
+	sterge = new QPushButton("&goleste lista");
+	genereaza = new QPushButton("&genereaza lista");
+	Export = new QPushButton("&export");
+	afisare = new QPushButton("&afisare");
+	exit = new QPushButton("&exit");
+
+	//QLineEdit
+	apartament = new QLineEdit;
+	numarApartamente = new QLineEdit;
+	numeFisier = new QLineEdit;
+
+	QFormLayout* form = new QFormLayout;
+	form->addRow("Apartament", apartament);
+	form->addRow("Numar apartamente", numarApartamente);
+	form->addRow("Nume fisier", numeFisier);
+
+
+	principalBox->addWidget(list);
+	principalBox->addLayout(form);
+	box->addWidget(adauga);
+	box->addWidget(sterge);
+	box->addWidget(genereaza);
+	box->addWidget(Export);
+	box->addWidget(afisare);
+	box->addWidget(exit);
+	principalBox->addLayout(box);
+	setLayout(principalBox);
+
+	QPalette pal = palette();
+	pal.setColor(QPalette::Window, Qt::lightGray);
+	pal.setColor(QPalette::Base, Qt::gray);
+	pal.setColor(QPalette::Shadow, Qt::lightGray);
+	setAutoFillBackground(true);
+	setPalette(pal);
+}
+
+/*
+* conectam butoanele
+* date de intrare:
+* date de iesire:
+*/
+void listNotificariGUI::connect()
+{
+	//srv.addObserver(this);
+	QWidget::connect(adauga, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		try {
+			try {
+				apartament1 = std::stoi(apartament->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.adaugaLista(apartament1);
+			loadList(srv.getAllLista(), srv.nrApartamenteLista());
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		catch (const listaException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		}
+	);
+
+	QWidget::connect(sterge, &QPushButton::clicked, [&]() {
+		srv.golesteLista();
+		loadList(srv.getAllLista(), srv.nrApartamenteLista());
+		});
+
+	/*QWidget::connect(genereaza, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		try {
+			try {
+				apartament1 = std::stoi(numarApartamente->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.genereazaLista(apartament1);
+			loadList(srv.getAllLista(), srv.nrApartamenteLista());
+		}
+		catch (const listaException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});*/
+
+	QWidget::connect(afisare, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.getAllLista() };
+		tab->setModal(false);
+		tab->show();
+
+		});
+
+	QWidget::connect(Export, &QPushButton::clicked, [&]() {
+		try {
+			srv.writeToFile(numeFisier->text().toStdString());
+		}
+		catch (const listaException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+
+	QWidget::connect(exit, &QPushButton::clicked, [&]() {
+		close();
+		});
+}
+
+void tabelDetalii::init() {
+	apartament = new QLineEdit;
+	nume = new QLineEdit;
+	suprafata = new QLineEdit;
+	tipApartament = new QLineEdit;
+	apartament->setReadOnly(true);
+	nume->setReadOnly(true);
+	suprafata->setReadOnly(true);
+	tipApartament->setReadOnly(true);
+	QFormLayout* form = new QFormLayout;
+	apartament->setText(QString::number(locatar.getApartament()));
+	nume->setText(QString::fromStdString(locatar.getNume()));
+	suprafata->setText(QString::number(locatar.getSuprafata()));
+	tipApartament->setText(QString::fromStdString(locatar.getTipApartament()));
+	form->addRow("Apartament", apartament);
+	form->addRow("Nume", nume);
+	form->addRow("Suprafata", suprafata);
+	form->addRow("Tip Apartament", tipApartament);
+	setLayout(form);
+}
+
+//functie de update
+//date de intrare:-
+//date de isire:-
+void CosCRUDGUI::update()
+{
+	loadTable(srv.getAllLista(), srv.nrApartamenteLista());
+}
+
+//initializare
+//date de intrare:-
+//date de isire:-
+void CosCRUDGUI::init()
+{
+	this->setWindowTitle("Fereastra Genereaza Apart.");
+
+	principalBox = new QHBoxLayout;
+	box = new QVBoxLayout;
+	box1 = new QHBoxLayout;
+	table = new QTableWidget{ 1, 4 };
+
+	//butoane
+
+	sterge = new QPushButton("&goleste lista");
+	genereaza = new QPushButton("&genereaza lista");
+
+	exit = new QPushButton("&exit");
+
+	//QLineEdit
+	numarApartamente = new QLineEdit;
+	apart = new QLineEdit;
+	apart->setReadOnly(true);
+	QFormLayout* form = new QFormLayout;
+	form->addRow("Numarul de apartamente de generat", numarApartamente);
+	form->addRow("Numarul de apartamente din lista", apart);
+
+	principalBox->addWidget(table);
+	principalBox->addLayout(form);
+	box->addWidget(sterge);
+	box->addWidget(genereaza);
+	box->addWidget(exit);
+	principalBox->addLayout(box);
+	setLayout(principalBox);
+
+	QPalette pal = palette();
+	pal.setColor(QPalette::Window, Qt::lightGray);
+	pal.setColor(QPalette::Base, Qt::gray);
+	pal.setColor(QPalette::Shadow, Qt::lightGray);
+	setAutoFillBackground(true);
+	setPalette(pal);
+}
+
+/*
+* conectam butoanele
+* date de intrare:
+* date de iesire:
+*/
+void CosCRUDGUI::connect()
+{
+	srv.addObserver(this);
+	QWidget::connect(sterge, &QPushButton::clicked, [&]() {
+		srv.golesteLista();
+		//loadTable(srv.getAllLista(), srv.nrApartamenteLista());
+		});
+
+	QWidget::connect(genereaza, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		try {
+			try {
+				apartament1 = std::stoi(numarApartamente->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.genereazaLista(apartament1);
+			//loadTable(srv.getAllLista(), srv.nrApartamenteLista());
+		}
+		catch (const listaException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+	QWidget::connect(exit, &QPushButton::clicked, [&]() {
+		srv.removeObserver(this);
+		close();
+		});
+}
+
+void CosCRUDGUI::loadTable(vector<Locatar>locatari, int numar) {
+
+	table->clear();
+	int l = table->rowCount();
+	for (int i = 0; i < l; i++)
+		table->removeRow(0);
+	table->setItem(0, 0, new QTableWidgetItem("apartament"));
+	table->setItem(0, 1, new QTableWidgetItem("nume"));
+	table->setItem(0, 2, new QTableWidgetItem("suprafata"));
+	table->setItem(0, 3, new QTableWidgetItem("tip apartament"));
+	for (const auto& l : locatari) {
+		table->insertRow(table->rowCount());
+		table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(QString::number(l.getApartament())));
+		table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(l.getNume())));
+		table->setItem(table->rowCount() - 1, 2, new QTableWidgetItem(QString::number(l.getSuprafata())));
+		table->setItem(table->rowCount() - 1, 3, new QTableWidgetItem(QString::fromStdString(l.getTipApartament())));
+	}
+	apart->setText(QString::number(numar));
+}
+
