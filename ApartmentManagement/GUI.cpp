@@ -210,3 +210,304 @@ void GUI::connect()
 	Undo();
 	afisareLocatar();
 }
+/*conectam butonul adauga cu functia de adaugare din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::adaugaLocatar()
+{
+	QWidget::connect(adauga, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		double suprafata1{ 0 };
+		try {
+			try {
+				apartament1 = std::stoi(apartament->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			try {
+				suprafata1 = std::stod(suprafata->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.adaugaLocatarService(apartament1, nume->text().toStdString(), suprafata1, tipApartament->text().toStdString());
+			loadList(srv.getAllService());
+			tab(srv.getAllService());
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		catch (const ValidException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+}
+
+/*conectam butonul afisare cu functia getALL din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::afisareLocatar()
+{
+	QWidget::connect(afisare, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.getAllService() };
+		tab->setModal(false);
+		tab->show();
+
+		});
+}
+
+/*conectam butonul sterge cu functia de stergere din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::stergeLocatar()
+{
+	QWidget::connect(sterge, &QPushButton::clicked, [&]() {
+		int apart = 0;
+		try {
+			try {
+				apart = std::stoi(apartament->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.stergereLocatarService(apart);
+			loadList(srv.getAllService());
+			tab(srv.getAllService());
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+}
+
+/*conectam butonul cauta cu functia de cautare din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::cautaLocatar()
+{
+	QWidget::connect(cauta, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		try {
+			try {
+				apartament1 = stoi(apartament->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			vector<Locatar>loc;
+			loc.push_back(srv.cautareApartamentService(apartament1));
+			auto tab = new tabel(loc);
+			tab->show();
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+}
+
+/*conectam butonul modifica cu functia de modificare din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::modificaLocatar()
+{
+	QWidget::connect(modifica, &QPushButton::clicked, [&]() {
+		int apartament1{ 0 };
+		double suprafata1{ 0 };
+		try {
+			try {
+				apartament1 = std::stoi(apartament->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			try {
+				suprafata1 = std::stod(suprafata->text().toStdString());
+			}
+			catch (const std::invalid_argument) {
+				QMessageBox::warning(this, "warning", "valoare invalida");
+				return;
+			}
+			srv.modificaLocatarService(apartament1, nume->text().toStdString(), suprafata1, tipApartament->text().toStdString());
+			loadList(srv.getAllService());
+			tab(srv.getAllService());
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		catch (const ValidException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+}
+
+/*conectam butonul filtrare la butoanele filtreTip si filtrareSuprafata
+* date de intrare:
+* date de iesire:
+*/
+void GUI::filtrareButton()
+{
+	QWidget::connect(filtrare, &QPushButton::clicked, [&]() {
+		box->addWidget(filtrareTip);
+		box->addWidget(filtrareSuprafata);
+		});
+}
+
+/*conectam butonul filtrareTip cu functia de filtrare dupa tipul apartamentului din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::filtrareTipApart()
+{
+	QWidget::connect(filtrareTip, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.filtrareTipApartament(tipApartament->text().toStdString()) };
+		tab->show();
+		});
+}
+
+/*conectam butonul filtrareSuprafata cu functia de filtrare dupa suprafata din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::filtrareSupra()
+{
+	QWidget::connect(filtrareSuprafata, &QPushButton::clicked, [&]() {
+		double suprafata1{ 0 };
+		try {
+			suprafata1 = std::stod(suprafata->text().toStdString());
+			auto tab = new tabel{ srv.filtrareSuprafata(suprafata1) };
+			tab->show();
+		}
+		catch (const std::invalid_argument) {
+			QMessageBox::warning(this, "warning", "valoare invalida");
+			return;
+		}
+		});
+}
+
+/*conectam butonul sortare la butoanele sortareSuprafata, sortareNume si sortareTipSuprafata
+* date de intrare:
+* date de iesire:
+*/
+void GUI::sortareButton()
+{
+	QWidget::connect(sortare, &QPushButton::clicked, [&]() {
+		box->addWidget(sortareSuprafata);
+		box->addWidget(sortareNume);
+		box->addWidget(sortareTipSuprafata);
+
+		});
+}
+
+/*conectam butonul sortareSuprafata cu functia de sortare dupa suprafata din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::sortSuprafata()
+{
+	QWidget::connect(sortareSuprafata, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.sortareSuprafata() };
+		tab->show();
+		});
+}
+
+/*conectam butonul sortareNume cu functia de sortare dupa nume din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::sortNume()
+{
+	QWidget::connect(sortareNume, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.sortareNume() };
+		tab->show();
+		});
+}
+
+/*conectam butonul sortareTipSuprafata cu functia de sortare dupa tip sisuprafata din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::sortTipSuprafata()
+{
+	QWidget::connect(sortareTipSuprafata, &QPushButton::clicked, [&]() {
+		auto tab = new tabel{ srv.sortareApartamentSuprafata() };
+		tab->show();
+		});
+}
+
+/*conectam butonul undo cu functia undo din service
+* date de intrare:
+* date de iesire:
+*/
+void GUI::Undo()
+{
+	QWidget::connect(undo, &QPushButton::clicked, [&]() {
+		try {
+			srv.undo();
+			loadList(srv.getAllService());
+			tab(srv.getAllService());
+		}
+		catch (const RepoException& msg) {
+			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
+		}
+		});
+}
+
+void GUI::tab(vector<Locatar> locatar)
+{
+	table->clear();
+	int l = table->rowCount();
+	for (int i = 0; i < l; i++)
+		table->removeRow(0);
+	table->setItem(0, 0, new QTableWidgetItem("apartament"));
+	table->setItem(0, 1, new QTableWidgetItem("nume"));
+	table->setItem(0, 2, new QTableWidgetItem("suprafata"));
+	table->setItem(0, 3, new QTableWidgetItem("tip apartament"));
+	for (const auto& l : locatar) {
+		table->insertRow(table->rowCount());
+		table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(QString::number(l.getApartament())));
+		table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(l.getNume())));
+		table->setItem(table->rowCount() - 1, 2, new QTableWidgetItem(QString::number(l.getSuprafata())));
+		table->setItem(table->rowCount() - 1, 3, new QTableWidgetItem(QString::fromStdString(l.getTipApartament())));
+	}
+}
+
+/*initilizare
+date de intrare:-
+date de iesire:-
+*/
+void tabel::init()
+{
+	this->setWindowTitle("Tabel");
+	box = new QHBoxLayout;
+	setModal(true);//nu putem accesa alte ferestre cat timp tabelul e pornit
+	QTableWidget* table = new QTableWidget{ 1, 4 };
+	QPalette pal = palette();
+	pal.setColor(QPalette::Window, Qt::lightGray);
+	pal.setColor(QPalette::Base, Qt::gray);
+	setAutoFillBackground(true);
+	setPalette(pal);
+	table->setItem(0, 0, new QTableWidgetItem("apartament"));
+	table->setItem(0, 1, new QTableWidgetItem("nume"));
+	table->setItem(0, 2, new QTableWidgetItem("suprafata"));
+	table->setItem(0, 3, new QTableWidgetItem("tip apartament"));
+	for (const auto& l : locatari) {
+		table->insertRow(table->rowCount());
+		table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(QString::number(l.getApartament())));
+		table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(l.getNume())));
+		table->setItem(table->rowCount() - 1, 2, new QTableWidgetItem(QString::number(l.getSuprafata())));
+		table->setItem(table->rowCount() - 1, 3, new QTableWidgetItem(QString::fromStdString(l.getTipApartament())));
+	}
+	box->addWidget(table);
+	setLayout(box);
+}
