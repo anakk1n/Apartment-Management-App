@@ -613,24 +613,6 @@ void listNotificariGUI::connect()
 		loadList(srv.getAllLista(), srv.nrApartamenteLista());
 		});
 
-	/*QWidget::connect(genereaza, &QPushButton::clicked, [&]() {
-		int apartament1{ 0 };
-		try {
-			try {
-				apartament1 = std::stoi(numarApartamente->text().toStdString());
-			}
-			catch (const std::invalid_argument) {
-				QMessageBox::warning(this, "warning", "valoare invalida");
-				return;
-			}
-			srv.genereazaLista(apartament1);
-			loadList(srv.getAllLista(), srv.nrApartamenteLista());
-		}
-		catch (const listaException& msg) {
-			QMessageBox::warning(this, "warning", QString::fromStdString(msg.getMesaj()));
-		}
-		});*/
-
 	QWidget::connect(afisare, &QPushButton::clicked, [&]() {
 		auto tab = new tabel{ srv.getAllLista() };
 		tab->setModal(false);
