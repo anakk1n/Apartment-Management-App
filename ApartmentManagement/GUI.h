@@ -128,3 +128,111 @@ public:
 		connect();
 	}
 };
+class CosCRUDGUI : public QWidget, public Observer {
+private:
+	LocatarService& srv;
+	//box-uri
+	QHBoxLayout* principalBox;
+	QVBoxLayout* box;
+	QHBoxLayout* box1;
+	QTableWidget* table;
+
+	//butoane
+	QPushButton* sterge;
+	QPushButton* genereaza;
+	QPushButton* exit;
+
+	//QLineEdit
+	QLineEdit* numarApartamente;
+	QLineEdit* apart;
+
+	//afisare tabel din lista de notificari
+	//date de intrare:-locatari:-vector
+	//                -numar:-int
+	//date de iesire:-
+	void loadTable(vector<Locatar>, int numar);
+
+	/*initilizare
+	date de intrare:-
+	date de iesire:-
+	*/
+	void init();
+
+	//functie de update
+	//date de intrare:-
+	//date de isire:-
+	void update() override;
+
+	/*
+* conectam butoanele
+* date de intrare:
+* date de iesire:
+*/
+	void connect();
+
+public:
+	//constructor
+	//date de intrare:-srv-referinta la LocatarService
+	//date de iesire:-
+	CosCRUDGUI(LocatarService& srv) :srv{ srv } {
+		init();
+		loadTable(srv.getAllLista(), srv.nrApartamenteLista());
+		connect();
+	}
+
+};
+
+
+
+class GUI :public QWidget
+{
+private:
+	LocatarService& srv;
+	//box-uri
+	QHBoxLayout* principalBox;
+	QVBoxLayout* box;
+	QHBoxLayout* box1;
+	QHBoxLayout* box2;
+	QHBoxLayout* box3;
+	QHBoxLayout* box4;
+	QHBoxLayout* box5;
+	QLabel* mesaj;
+	QVBoxLayout* buttAndLines;
+	QHBoxLayout* buttons;
+
+	//butoane
+	QPushButton* adauga;
+	QPushButton* afisare;
+	QPushButton* sterge;
+	QPushButton* cauta;
+	QPushButton* modifica;
+	QPushButton* filtrare;
+	QPushButton* filtrareTip;
+	QPushButton* filtrareSuprafata;
+	QPushButton* sortare;
+	QPushButton* sortareSuprafata;
+	QPushButton* sortareNume;
+	QPushButton* sortareTipSuprafata;
+	QPushButton* undo;
+	QPushButton* listaNotificari;
+	QPushButton* CosCRUD;
+	QPushButton* adaugaCos;
+	QPushButton* Export;
+	QPushButton* genereaza;
+	QPushButton* exit;
+
+	//QLineEdit
+	QLineEdit* apartament;
+	QLineEdit* nume;
+	QLineEdit* suprafata;
+	QLineEdit* tipApartament;
+	QLineEdit* fisier;
+	QLineEdit* nrApart;
+
+	//lista
+	QListWidget* list;
+	QTableWidget* table;
+	//functii
+
+	QListWidgetItem* selectedItem = nullptr;
+
