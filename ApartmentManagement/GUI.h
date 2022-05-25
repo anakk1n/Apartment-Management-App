@@ -236,3 +236,110 @@ private:
 
 	QListWidgetItem* selectedItem = nullptr;
 
+	/*init
+	* date de intrare:-
+	* date de iesire:-
+	*/
+	void init();
+
+	/*afisare lista utilizand QListWidget
+	* date de intrare:-vector de Locatar
+	* date de iesire:
+	*/
+	void loadList(vector<Locatar>);
+
+	/*
+	* conectam butoanele cu functiile
+	* date de intrare:
+	* date de iesire:
+	*/
+	void connect();
+
+	/*conectam butonul adauga cu functia de adaugare din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void adaugaLocatar();
+
+	/*conectam butonul afisare cu functia getALL din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void afisareLocatar();
+
+	/*conectam butonul sterge cu functia de stergere din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void stergeLocatar();
+
+	/*conectam butonul cauta cu functia de cautare din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void cautaLocatar();
+
+	/*conectam butonul modifica cu functia de modificare din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void modificaLocatar();
+
+	/*conectam butonul filtrare la butoanele filtreTip si filtrareSuprafata
+	* date de intrare:
+	* date de iesire:
+	*/
+	void filtrareButton();
+
+	/*conectam butonul filtrareTip cu functia de filtrare dupa tipul apartamentului din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void filtrareTipApart();
+
+	/*conectam butonul filtrareSuprafata cu functia de filtrare dupa suprafata din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void filtrareSupra();
+
+	/*conectam butonul sortare la butoanele sortareSuprafata, sortareNume si sortareTipSuprafata
+	* date de intrare:
+	* date de iesire:
+	*/
+	void sortareButton();
+
+	/*conectam butonul sortareSuprafata cu functia de sortare dupa suprafata din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void sortSuprafata();
+
+	/*conectam butonul sortareNume cu functia de sortare dupa nume din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void sortNume();
+
+	/*conectam butonul sortareTipSuprafata cu functia de sortare dupa tip sisuprafata din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void sortTipSuprafata();
+
+	/*conectam butonul undo cu functia undo din service
+	* date de intrare:
+	* date de iesire:
+	*/
+	void Undo();
+
+	void tab(vector<Locatar>);
+
+public:
+	GUI(LocatarService& srv) :srv{ srv } {
+		init();
+		loadList(srv.getAllService());
+		connect();
+		tab(srv.getAllService());
+	}
+};
